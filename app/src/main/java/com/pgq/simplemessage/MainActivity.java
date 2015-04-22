@@ -43,7 +43,7 @@ public class MainActivity extends ActionBarActivity {
         // do not change the size of the RecyclerView
         mLvMainListView.setHasFixedSize(true);
         mAdapter = new ContactsListAdapter(list);
-        mLvMainListView.addItemDecoration(new DividerItemDecoration(getApplicationContext(),DividerItemDecoration.VERTICAL_LIST));
+        mLvMainListView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL_LIST));
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);

@@ -1,6 +1,5 @@
 package com.pgq.simplemessage;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,40 +15,54 @@ import java.util.List;
  */
 public class ContactInformationHelper {
 
-    private String id, name, phoneNumber, email;
-
+    Cursor c;
 
     public List<ListContactsBean> getContactInformation(Context mContext) {
-        List<ListContactsBean> list = new ArrayList<>();
+        ArrayList<ListContactsBean> listMembers = new ArrayList<>();
+        Cursor cursor = null;
+        try {
+            Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+            // 这里是获取联系人表的电话里的信息  包括：名字，名字拼音，联系人id,电话号码；
+            // 然后在根据"sort-key"排序
 
-        Uri mContacts = ContactsContract.Contacts.CONTENT_URI;
-        ContentResolver contentResolver = mContext.getContentResolver();
-        Cursor cursor = contentResolver.query(mContacts, null, null, null, null);
-        while (cursor.moveToNext())
-
-        {
-
-            id = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.Contacts._ID));
-            name = cursor.getString(cursor.getColumnIndex(android.provider.ContactsContract.Contacts.DISPLAY_NAME));
-
-            //获取 Phone Number
-            Cursor phoneCursor = contentResolver.query(
-                    android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    null, android.provider.ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=" + id, null, null);
-            while (phoneCursor.moveToNext()) {
-                ListContactsBean listContactsBean = new ListContactsBean();
-                phoneNumber = phoneCursor.getString(
-                        phoneCursor.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER));
-                listContactsBean.setId(id);
-                listContactsBean.setImg("");
-                listContactsBean.setName(name);
-                listContactsBean.setPhoneNumber(phoneNumber);
-                list.add(listContactsBean);
+            cursor = mContext.getContentResolver().query(uri, new String[]{"display_name", "sort_key", "contact_id", "data1"}, null, null, "sort_key");
+            if (cursor.moveToFirst()) {
+                do {
+                    ListContactsBean contact = new ListContactsBean();
+                    String contact_phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    String name = cursor.getString(0);
+                    String sortKey = getSortKey(cursor.getString(1));
+                    int contact_id = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+                    contact.contact_name = name;
+                    contact.sortKey = sortKey;
+                    contact.contact_phone = contact_phone;
+                    contact.setContact_id(contact_id);
+                    if (name != null)
+                        listMembers.add(contact);
+                } while (cursor.moveToNext());
+                c = cursor;
             }
-            phoneCursor.close();
-
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            mContext = null;
         }
-        cursor.close();
-        return list;
+        return listMembers;
+
+    }
+
+    /**
+     * 获取sort key的首个字符，如果是英文字母就直接返回，否则返回#。
+     *
+     * @param sortKeyString
+     *         数据库中读取出的sort key
+     * @return 英文字母或者#
+     */
+    private static String getSortKey(String sortKeyString) {
+        String key = sortKeyString.substring(0, 1).toUpperCase();
+        if (key.matches("[A-Z]")) {
+            return key;
+        }
+        return "#";
     }
 }

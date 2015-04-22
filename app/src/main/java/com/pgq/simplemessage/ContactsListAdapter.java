@@ -76,13 +76,13 @@ public class ContactsListAdapter extends RecyclerView.Adapter<ContactsListAdapte
 //        holder.mIvImg.setImageResource();
         final ListContactsBean item = mDataset.get(position);
 
-        holder.mTvName.setText(item.getName());
-        holder.mTvPhoneNumber.setText(item.getPhoneNumber());
+        holder.mTvName.setText(item.contact_name);
+        holder.mTvPhoneNumber.setText(item.contact_phone);
         holder.mListItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String strPhoneNumber = item.getPhoneNumber();
-                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+strPhoneNumber));
+                String strPhoneNumber = item.contact_phone;
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + strPhoneNumber));
                 v.getContext().startActivity(intent);
             }
         });
