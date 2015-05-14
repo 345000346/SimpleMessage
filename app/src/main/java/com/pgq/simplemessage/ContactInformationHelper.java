@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Cocoa on 2015-4-21-0021.
+ * Created by PGQ on 2015-4-21-0021.
  */
 public class ContactInformationHelper {
 
